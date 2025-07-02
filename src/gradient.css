@@ -1,0 +1,24 @@
+/* Direct CSS approach for gradient text */
+.gradient-text-primary {
+  background-image: linear-gradient(to right, #2a2a99, #4a4ad9, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.gradient-text-secondary {
+  background-image: linear-gradient(to right, #4338ca, #6366f1, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.gradient-text-vibrant {
+  background-image: linear-gradient(to right, #3730a3, #4f46e5, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+} 
