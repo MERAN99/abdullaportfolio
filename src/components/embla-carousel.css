@@ -1,0 +1,128 @@
+.embla {
+  --slide-spacing: 0.75rem;
+  --slide-size: 100%;
+  --slide-height: 15rem;
+  padding: 1rem;
+  position: relative;
+}
+
+.embla__viewport {
+  overflow: hidden;
+  cursor: grab;
+}
+
+.embla__viewport:active {
+  cursor: grabbing;
+}
+
+.embla__container {
+  backface-visibility: hidden;
+  display: flex;
+  touch-action: pan-y;
+  margin-left: calc(var(--slide-spacing) * -1);
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.embla__slide {
+  flex: 0 0 var(--slide-size);
+  min-width: 0;
+  padding-left: var(--slide-spacing);
+  position: relative;
+}
+
+@media (min-width: 576px) {
+  .embla__slide {
+    flex: 0 0 50%;
+  }
+}
+
+@media (min-width: 768px) {
+  .embla__slide {
+    flex: 0 0 33.3333%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .embla__slide {
+    flex: 0 0 33.3333%;
+  }
+}
+
+.embla__slide__inner {
+  display: block;
+  height: var(--slide-height);
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.embla__button {
+  -webkit-appearance: none;
+  background-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 2.5rem;
+  height: 2.5rem;
+  z-index: 10;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.embla__button--prev {
+  left: 1.25rem;
+}
+
+.embla__button--next {
+  right: 1.25rem;
+}
+
+.embla__button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.embla__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+
+.embla__dot {
+  -webkit-appearance: none;
+  background-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background-color: #cccccc;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.embla__dot:hover {
+  transform: scale(1.2);
+}
+
+.embla__dot--selected {
+  background-color: #3b82f6;
+  transform: scale(1.2);
+} 

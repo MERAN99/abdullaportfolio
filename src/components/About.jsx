@@ -1,36 +1,49 @@
-import { motion } from 'framer-motion';
+import React from 'react';
 import { useTheme } from '../context/ThemeContext';
+import LottieMoon from './LottieMoon';
 
 const About = () => {
   const { isDarkMode } = useTheme();
   
   return (
-    <section id="about" className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-      <div className="container mx-auto px-4">
-        <motion.h2 
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="section-title text-center"
-        >
-          Professional Summary
-        </motion.h2>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="max-w-3xl mx-auto text-center"
-        >
-          <p className={`text-lg leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-            <span className="font-semibold bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 inline-block text-transparent bg-clip-text">Passionate Full Stack Developer</span> with over 4 years of hands-on experience building modern, 
-            responsive web and mobile applications. Proficient in both frontend and backend technologies 
-            with a strong foundation in computer science and real-world development experience in 
-            international and local companies.
-          </p>
-        </motion.div>
+    <section 
+      id="about" 
+      className="relative min-h-screen py-20 flex items-center overflow-hidden"
+      style={{
+        backgroundColor: isDarkMode ? '#050505' : '#f8f9fa',
+        color: isDarkMode ? '#f8f9fa' : '#212529',
+        zIndex: 1
+      }}
+    >
+      {/* Moon Animation */}
+      <LottieMoon />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-2xl">
+          <h2 className="text-4xl md:text-5xl font-bold mb-8" style={{ fontFamily: 'Raleway, sans-serif' }}>
+            Professional Summary
+          </h2>
+          
+          <div className="space-y-6 text-lg">
+            <p>
+              I'm a passionate Full Stack Developer with expertise in building modern web applications 
+              using cutting-edge technologies. My journey in software development has equipped me with 
+              a diverse skill set spanning front-end and back-end development.
+            </p>
+            
+            <p>
+              With a strong foundation in JavaScript and its frameworks, I specialize in creating 
+              responsive, user-friendly interfaces that deliver exceptional user experiences. I'm 
+              particularly interested in animation, interactive design, and performance optimization.
+            </p>
+            
+            <p>
+              I thrive in collaborative environments and enjoy tackling complex problems with elegant 
+              solutions. My goal is to continue growing as a developer while contributing to projects 
+              that make a positive impact.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

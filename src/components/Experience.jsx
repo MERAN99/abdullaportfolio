@@ -45,14 +45,14 @@ const Experience = () => {
   ];
 
   return (
-    <section id="experience" className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+    <section id="experience" className="py-16">
       <div className="container mx-auto px-4">
         <motion.h2 
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="section-title text-center"
+          className={`section-title text-center ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
         >
           Work Experience
         </motion.h2>
@@ -65,7 +65,7 @@ const Experience = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className={`rounded-lg shadow-lg p-6 relative overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
+              className={`rounded-lg shadow-lg p-6 relative overflow-hidden ${isDarkMode ? 'bg-gray-900/80' : 'bg-white/80'} backdrop-blur-sm`}
             >
               <div className="absolute top-0 left-0 w-2 h-full bg-gradient-primary"></div>
               

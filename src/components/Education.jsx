@@ -6,14 +6,14 @@ const Education = () => {
   const { isDarkMode } = useTheme();
   
   return (
-    <section id="education" className={`py-16 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+    <section id="education" className="py-16">
       <div className="container mx-auto px-4">
         <motion.h2 
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="section-title text-center"
+          className={`section-title text-center ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
         >
           Education
         </motion.h2>
@@ -23,7 +23,7 @@ const Education = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className={`mt-10 max-w-2xl mx-auto rounded-lg shadow-lg p-6 relative ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+          className={`mt-10 max-w-2xl mx-auto rounded-lg shadow-lg p-6 relative ${isDarkMode ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm`}
         >
           <div className="absolute top-0 left-0 w-2 h-full bg-gradient-primary rounded-l-lg"></div>
           

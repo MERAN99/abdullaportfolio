@@ -16,7 +16,8 @@ const Navigation = () => {
     { id: 'skills', label: 'Skills' },
     { id: 'experience', label: 'Experience' },
     { id: 'education', label: 'Education' },
-    { id: 'languages', label: 'Languages' }
+    { id: 'languages', label: 'Languages' },
+    { id: 'contact', label: 'Contact' }
   ];
 
   // Helper function to get element position with better accuracy
@@ -120,20 +121,18 @@ const Navigation = () => {
 
   return (
     <nav 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 backdrop-blur-md ${
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 glossy-nav ${
         scrolled 
-          ? isDarkMode ? 'bg-gray-950/90 shadow-lg py-2 border-b border-gray-800' : 'bg-white/90 shadow-lg py-2'
-          : 'bg-gray-900/80 py-4 border-b border-gray-800/50'
+          ? isDarkMode ? 'py-2 border-b border-blue-900/30' : 'py-2 border-b border-blue-300/30'
+          : 'py-4'
       }`}
       style={{
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        boxShadow: scrolled 
-          ? (isDarkMode ? '0 4px 30px rgba(0, 0, 0, 0.3)' : '0 4px 30px rgba(0, 0, 0, 0.1)')
-          : '0 4px 30px rgba(0, 0, 0, 0.4)',
         background: scrolled 
-          ? (isDarkMode ? 'rgba(10, 10, 20, 0.9)' : 'rgba(255, 255, 255, 0.9)') 
-          : 'linear-gradient(to bottom right, rgba(17, 24, 39, 0.85), rgba(10, 10, 20, 0.9))'
+          ? (isDarkMode ? 'rgba(15, 23, 42, 0.75)' : 'rgba(30, 41, 59, 0.65)') 
+          : 'rgba(15, 23, 42, 0.5)',
+        boxShadow: scrolled 
+          ? (isDarkMode ? '0 4px 30px rgba(0, 0, 0, 0.3)' : '0 4px 30px rgba(59, 130, 246, 0.2)')
+          : 'none'
       }}
     >
       <div className="container mx-auto px-4">

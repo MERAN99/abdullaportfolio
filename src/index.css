@@ -1,6 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Enable smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Video background effects */
+.earth-video {
+  filter: drop-shadow(0 0 15px rgba(100, 149, 237, 0.5));
+}
+
+.moon-video {
+  filter: drop-shadow(0 0 25px rgba(210, 214, 255, 0.5));
+  transition: filter 0.5s ease;
+  will-change: transform;
+}
+
+.moon-video:hover {
+  filter: drop-shadow(0 0 35px rgba(210, 214, 255, 0.7));
+}
+
+/* Black background section */
+.black-bg-section {
+  background-color: #000;
+  position: relative;
+  z-index: 1;
+}
+
+.black-bg-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+  transform: translateY(-100%);
+  z-index: -1;
+}
+
+.black-bg-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+  transform: translateY(100%);
+  z-index: -1;
+}
+
+.glossy-nav {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {

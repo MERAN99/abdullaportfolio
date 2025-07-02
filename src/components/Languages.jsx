@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FaLanguage } from 'react-icons/fa';
+import { FaLanguage, FaFacebook } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 
 const Languages = () => {
@@ -27,14 +27,14 @@ const Languages = () => {
   ];
 
   return (
-    <section id="languages" className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+    <section id="languages" className="py-16">
       <div className="container mx-auto px-4">
         <motion.h2 
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="section-title text-center"
+          className={`section-title text-center ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
         >
           Languages
         </motion.h2>
@@ -47,7 +47,7 @@ const Languages = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="mb-6"
+              className={`mb-6 p-4 rounded-lg ${isDarkMode ? 'bg-gray-800/70' : 'bg-white/70'} backdrop-blur-sm`}
             >
               <div className="flex items-center mb-2">
                 <FaLanguage className={`mr-2 ${isDarkMode ? 'text-primary-400' : 'text-primary-600'}`} size={20} />
@@ -70,6 +70,29 @@ const Languages = () => {
               </div>
             </motion.div>
           ))}
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-12 flex justify-center"
+            id="contact"
+          >
+            <motion.a
+              href="https://www.facebook.com/share/1BfeW4WCLL/?mibextid=wwXIfr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium text-white 
+                bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 
+                transition-all duration-300 shadow-lg hover:shadow-xl`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FaFacebook size={20} />
+              Contact Me
+            </motion.a>
+          </motion.div>
         </div>
       </div>
     </section>
