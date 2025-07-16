@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaChevronDown } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
+import SplitText from './Animations/animationText/SplitText';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,14 +23,17 @@ const Header = () => {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       
-      setMousePosition({ x, y });
+      // Only update if position changed significantly to reduce re-renders
+      if (Math.abs(mousePosition.x - x) > 5 || Math.abs(mousePosition.y - y) > 5) {
+        setMousePosition({ x, y });
+      }
     };
     
     window.addEventListener('mousemove', handleMouseMove);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [mousePosition]);
   
   // Scroll down function
   const scrollDown = () => {
@@ -45,19 +49,24 @@ const Header = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           {/* Profile Section */}
           <div className="flex items-center mb-6 md:mb-0">
+            
             <div>
-              <motion.h1 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-300 inline-block text-transparent bg-clip-text"
-                style={{
-                  transform: `translate(${mousePosition.x * 0.01}px, ${mousePosition.y * 0.01}px)`,
-                  textShadow: '0 0 30px rgba(100, 100, 255, 0.5)'
-                }}
-              >
-                Abdulla Mohammed Ahmed
-              </motion.h1>
+              
+                   <SplitText
+                    text="Abdulla Mohammed Ahmed"
+                    className="text-5xl font-semibold text-center text-blue-300 "
+                    delay={100}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 40 }}
+                    to={{ opacity: 1, y: 0 }}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    textAlign="center"
+                  />
+           
+           
               <motion.p 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
