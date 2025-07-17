@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node verify-assets.js",
+    "verify": "node verify-assets.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
