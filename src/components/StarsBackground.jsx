@@ -32,20 +32,29 @@ const StarsBackground = () => {
       createStars();
     };
     
-    // Create stars
+    // Create stars with more variety
     const createStars = () => {
-      // Limit number of stars for better performance
-      const count = Math.min(Math.floor((canvas.width * canvas.height) / 10000), 200);
+      // Create a mix of bright and dim stars
+      const count = Math.min(Math.floor((canvas.width * canvas.height) / 8000), 300);
       stars.length = 0;
       
       for (let i = 0; i < count; i++) {
+        // Create different types of stars
+        const isBrightStar = Math.random() < 0.2; // 20% chance of a bright star
+        
         stars.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          radius: Math.random() * 1.5 + 0.5,
-          opacity: Math.random() * 0.8 + 0.2,
-          twinkleSpeed: Math.random() * 0.02 + 0.003,
-          twinkleOffset: Math.random() * Math.PI * 2 // Random starting point in the sine wave
+          // Vary star sizes more realistically
+          radius: isBrightStar ? Math.random() * 2 + 1 : Math.random() * 1 + 0.2,
+          // Base opacity - brighter stars are more consistent
+          baseOpacity: isBrightStar ? Math.random() * 0.3 + 0.7 : Math.random() * 0.5 + 0.3,
+          // Much slower twinkle for realistic effect
+          twinkleSpeed: Math.random() * 0.0008 + 0.0001, // Significantly reduced speed
+          twinkleAmount: isBrightStar ? 0.15 : 0.25, // Bright stars twinkle less
+          twinkleOffset: Math.random() * Math.PI * 2, // Random starting point in the sine wave
+          // Some stars don't twinkle much at all
+          noTwinkle: Math.random() < 0.3 // 30% chance of minimal twinkling
         });
       }
     };
@@ -63,9 +72,30 @@ const StarsBackground = () => {
       
       // Draw stars
       stars.forEach(star => {
-        // Twinkle effect with time-based animation
-        star.opacity = Math.sin(timestamp * star.twinkleSpeed + star.twinkleOffset) * 0.3 + 0.5;
+        // Calculate opacity with much more subtle twinkling
+        let opacityVariation = star.noTwinkle ? 
+          star.twinkleAmount * 0.2 : // Very minimal variation for "fixed" stars
+          Math.sin(timestamp * star.twinkleSpeed + star.twinkleOffset) * star.twinkleAmount;
         
+        star.opacity = Math.max(0.1, Math.min(1, star.baseOpacity + opacityVariation));
+        
+        // Draw the star with a subtle glow for brighter stars
+        if (star.radius > 1) {
+          // Draw glow
+          const gradient = ctx.createRadialGradient(
+            star.x, star.y, 0,
+            star.x, star.y, star.radius * 4
+          );
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${star.opacity * 0.8})`);
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius * 4, 0, 2 * Math.PI);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        }
+        
+        // Draw star core
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
         ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
@@ -90,7 +120,7 @@ const StarsBackground = () => {
       ref={canvasRef} 
       className="absolute inset-0 z-0 pointer-events-none"
       style={{ 
-        opacity: 0.7,
+        opacity: 0.8,
         width: '100%',
         height: '100%',
         willChange: 'transform'

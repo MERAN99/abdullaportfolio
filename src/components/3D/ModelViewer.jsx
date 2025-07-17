@@ -26,7 +26,9 @@ import {
   } from "@react-three/drei";
   import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
   import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
   import * as THREE from "three";
+  import React from "react";
   
   const isTouch =
     typeof window !== "undefined" &&
@@ -42,19 +44,42 @@ import {
   
   const Loader = ({ placeholderSrc }) => {
     const { progress, active } = useProgress();
-    if (!active && placeholderSrc) return null;
+    const [showLoader, setShowLoader] = useState(false);
+    
+    // Use useEffect to set the showLoader state
+    useEffect(() => {
+      setShowLoader(active || !!placeholderSrc);
+    }, [active, placeholderSrc]);
+    
+    if (!showLoader) return null;
+    
     return (
       <Html center>
-        {placeholderSrc ? (
-          <img
-            src={placeholderSrc}
-            width={128}
-            height={128}
-            className="blur-lg rounded-lg"
-          />
-        ) : (
-          `${Math.round(progress)} %`
-        )}
+        <div style={{
+          background: "rgba(0,0,0,0.7)",
+          padding: "20px",
+          borderRadius: "10px",
+          color: "white",
+          textAlign: "center"
+        }}>
+          {placeholderSrc ? (
+            <div>
+              <img
+                src={placeholderSrc}
+                width={128}
+                height={128}
+                style={{ borderRadius: "8px", margin: "0 auto 10px" }}
+                alt="Loading placeholder"
+              />
+              <div>Loading: {Math.round(progress)}%</div>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: "24px", marginBottom: "10px" }}>Loading 3D Model</div>
+              <div style={{ fontSize: "18px" }}>{Math.round(progress)}%</div>
+            </div>
+          )}
+        </div>
       </Html>
     );
   };
@@ -106,26 +131,95 @@ import {
     const cHov = useRef({ x: 0, y: 0 });
   
     const ext = useMemo(() => url.split(".").pop().toLowerCase(), [url]);
-    const content = useMemo(() => {
-      console.log("Loading model:", url, "with extension:", ext);
-      try {
-        if (ext === "glb" || ext === "gltf") {
-          const gltf = useGLTF(url);
-          console.log("GLTF loaded successfully:", gltf);
-          return gltf.scene.clone();
+    const [modelContent, setModelContent] = useState(null);
+    const [loadError, setLoadError] = useState(null);
+
+    // Use useGLTF only for GLB/GLTF files and wrap in a try/catch
+    const gltfResult = useMemo(() => {
+      if (ext === "glb" || ext === "gltf") {
+        try {
+          return useGLTF(url);
+        } catch (error) {
+          console.error("Error loading GLTF:", error);
+          return null;
         }
-        if (ext === "fbx") return useFBX(url).clone();
-        if (ext === "obj") return useLoader(OBJLoader, url).clone();
-        console.error("Unsupported format:", ext);
-      } catch (error) {
-        console.error("Error loading model:", error);
       }
       return null;
     }, [url, ext]);
-  
+
+    // Set the model content when the GLTF is loaded
+    useEffect(() => {
+      if (ext === "glb" || ext === "gltf" && gltfResult?.scene) {
+        setModelContent(gltfResult.scene.clone());
+        setLoadError(null);
+      }
+    }, [gltfResult, ext]);
+
+    // Load other model types
+    useEffect(() => {
+      let isMounted = true;
+      
+      const loadModel = async () => {
+        try {
+          if (ext !== "glb" && ext !== "gltf") {
+            console.log("Loading non-GLTF model:", url, "with extension:", ext);
+            
+            if (ext === "fbx") {
+              const fbx = await new Promise((resolve, reject) => {
+                try {
+                  const result = useFBX(url);
+                  resolve(result);
+                } catch (error) {
+                  reject(error);
+                }
+              });
+              if (isMounted) {
+                setModelContent(fbx.clone());
+                setLoadError(null);
+              }
+            } else if (ext === "obj") {
+              const obj = await useLoader(OBJLoader, url);
+              if (isMounted) {
+                setModelContent(obj.clone());
+                setLoadError(null);
+              }
+            } else {
+              console.error("Unsupported format:", ext);
+              if (isMounted) {
+                setLoadError(`Unsupported format: ${ext}`);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error loading model:", error);
+          if (isMounted) {
+            setLoadError(error.message || "Failed to load model");
+          }
+        }
+      };
+      
+      loadModel();
+      
+      return () => {
+        isMounted = false;
+      };
+    }, [url, ext]);
+
+    const content = modelContent || (ext === "glb" || ext === "gltf" ? gltfResult?.scene : null);
+    
     const pivotW = useRef(new THREE.Vector3());
+    
+    // Initialize the refs with default values to prevent null references
+    useEffect(() => {
+      if (!tPar.current) tPar.current = { x: 0, y: 0 };
+      if (!cPar.current) cPar.current = { x: 0, y: 0 };
+      if (!tHov.current) tHov.current = { x: 0, y: 0 };
+      if (!cHov.current) cHov.current = { x: 0, y: 0 };
+      if (!vel.current) vel.current = { x: 0, y: 0 };
+    }, []);
+  
     useLayoutEffect(() => {
-      if (!content) return;
+      if (!content || !inner.current) return;
       const g = inner.current;
       g.updateWorldMatrix(true, true);
   
@@ -147,6 +241,7 @@ import {
         }
       });
   
+      if (!outer.current) return;
       g.getWorldPosition(pivotW.current);
       pivot.copy(pivotW.current);
       outer.current.rotation.set(initPitch, initYaw, 0);
@@ -249,6 +344,7 @@ import {
       };
   
       const move = (e) => {
+        if (e.pointerType !== "touch") return;
         const p = pts.get(e.pointerId);
         if (!p) return;
         p.x = e.clientX;
@@ -268,7 +364,7 @@ import {
           }
         }
   
-        if (mode === "rotate") {
+        if (mode === "rotate" && outer.current) {
           e.preventDefault();
           const dx = e.clientX - lx;
           const dy = e.clientY - ly;
@@ -278,7 +374,7 @@ import {
           outer.current.rotation.x += dy * ROTATE_SPEED;
           vel.current = { x: dx * ROTATE_SPEED, y: dy * ROTATE_SPEED };
           invalidate();
-        } else if (mode === "pinch" && pts.size === 2) {
+        } else if (mode === "pinch" && pts.size === 2 && camera) {
           e.preventDefault();
           const [p1, p2] = [...pts.values()];
           const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
@@ -328,62 +424,104 @@ import {
     }, [enableMouseParallax, enableHoverRotation]);
   
     useFrame((_, dt) => {
+      if (!outer.current || !camera || !pivotW.current) return;
+      
       let need = false;
-      cPar.current.x += (tPar.current.x - cPar.current.x) * PARALLAX_EASE;
-      cPar.current.y += (tPar.current.y - cPar.current.y) * PARALLAX_EASE;
-      const phx = cHov.current.x,
-        phy = cHov.current.y;
-      cHov.current.x += (tHov.current.x - cHov.current.x) * HOVER_EASE;
-      cHov.current.y += (tHov.current.y - cHov.current.y) * HOVER_EASE;
-  
-      const ndc = pivotW.current.clone().project(camera);
-      ndc.x += xOff + cPar.current.x;
-      ndc.y += yOff + cPar.current.y;
-      outer.current.position.copy(ndc.unproject(camera));
-  
-      outer.current.rotation.x += cHov.current.x - phx;
-      outer.current.rotation.y += cHov.current.y - phy;
-  
-      if (autoRotate) {
-        outer.current.rotation.y += autoRotateSpeed * dt;
-        need = true;
+      
+      try {
+        if (!cPar.current || !tPar.current || !cHov.current || !tHov.current || !vel.current) return;
+        
+        cPar.current.x += (tPar.current.x - cPar.current.x) * PARALLAX_EASE;
+        cPar.current.y += (tPar.current.y - cPar.current.y) * PARALLAX_EASE;
+        const phx = cHov.current.x,
+          phy = cHov.current.y;
+        cHov.current.x += (tHov.current.x - cHov.current.x) * HOVER_EASE;
+        cHov.current.y += (tHov.current.y - cHov.current.y) * HOVER_EASE;
+    
+        // Clone pivotW and project it safely
+        const ndc = pivotW.current.clone();
+        if (!ndc) return;
+        
+        ndc.project(camera);
+        ndc.x += xOff + cPar.current.x;
+        ndc.y += yOff + cPar.current.y;
+        
+        if (outer.current && outer.current.position) {
+          outer.current.position.copy(ndc.unproject(camera));
+        
+          outer.current.rotation.x += cHov.current.x - phx;
+          outer.current.rotation.y += cHov.current.y - phy;
+      
+          if (autoRotate) {
+            outer.current.rotation.y += autoRotateSpeed * dt;
+            need = true;
+          }
+      
+          outer.current.rotation.y += vel.current.x;
+          outer.current.rotation.x += vel.current.y;
+        }
+        
+        vel.current.x *= INERTIA;
+        vel.current.y *= INERTIA;
+        if (Math.abs(vel.current.x) > 1e-4 || Math.abs(vel.current.y) > 1e-4)
+          need = true;
+    
+        if (
+          Math.abs(cPar.current.x - tPar.current.x) > 1e-4 ||
+          Math.abs(cPar.current.y - tPar.current.y) > 1e-4 ||
+          Math.abs(cHov.current.x - tHov.current.x) > 1e-4 ||
+          Math.abs(cHov.current.y - tHov.current.y) > 1e-4
+        )
+          need = true;
+    
+        if (need) invalidate();
+      } catch (error) {
+        console.error("Error in useFrame:", error);
       }
-  
-      outer.current.rotation.y += vel.current.x;
-      outer.current.rotation.x += vel.current.y;
-      vel.current.x *= INERTIA;
-      vel.current.y *= INERTIA;
-      if (Math.abs(vel.current.x) > 1e-4 || Math.abs(vel.current.y) > 1e-4)
-        need = true;
-  
-      if (
-        Math.abs(cPar.current.x - tPar.current.x) > 1e-4 ||
-        Math.abs(cPar.current.y - tPar.current.y) > 1e-4 ||
-        Math.abs(cHov.current.x - tHov.current.x) > 1e-4 ||
-        Math.abs(cHov.current.y - tHov.current.y) > 1e-4
-      )
-        need = true;
-  
-      if (need) invalidate();
     });
   
     if (!content) return null;
     return (
       <group ref={outer}>
         <group ref={inner}>
-          <primitive 
-            object={content} 
-            scale={[modelScale, modelScale, modelScale]} 
-          />
+          <ErrorBoundary fallback={<mesh><boxGeometry args={[1, 1, 1]} /><meshStandardMaterial color="red" /></mesh>}>
+            <primitive 
+              object={content} 
+              scale={[modelScale, modelScale, modelScale]} 
+            />
+          </ErrorBoundary>
         </group>
       </group>
     );
   };
   
+  // Simple error boundary component
+  class ErrorBoundary extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false };
+    }
+  
+    static getDerivedStateFromError(error) {
+      return { hasError: true };
+    }
+  
+    componentDidCatch(error, errorInfo) {
+      console.error("Error in 3D component:", error, errorInfo);
+    }
+  
+    render() {
+      if (this.state.hasError) {
+        return this.props.fallback;
+      }
+      return this.props.children;
+    }
+  }
+  
   const ModelViewer = ({
     url,
-    width = '500px',
-    height = '500px',
+    width = 500,
+    height = 500,
     modelXOffset = 0,
     modelYOffset = 0,
     defaultRotationX = -50,
@@ -409,6 +547,7 @@ import {
     onModelLoaded,
   }) => {
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
     const pivot = useRef(new THREE.Vector3()).current;
     const canvasRef = useRef(null);
     const contactRef = useRef(null);
@@ -418,25 +557,19 @@ import {
     
     // Preload the model to catch any loading errors
     useEffect(() => {
-      const preloadModel = async () => {
-        try {
-          const ext = url.split(".").pop().toLowerCase();
-          if (ext === "glb" || ext === "gltf") {
-            // Clear any previous cached version of this model
-            useGLTF.clear(url);
-            await useGLTF.preload(url);
-          }
-        } catch (err) {
-          console.error("Error preloading model:", err);
-          setError(err.message);
-        }
-      };
+      setLoading(true);
       
-      preloadModel();
+      // The model will be loaded by the useGLTF hook
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
       
-      // Clean up when component unmounts
       return () => {
-        useGLTF.clear(url);
+        clearTimeout(timer);
+        // Clean up when component unmounts
+        if (url) {
+          useGLTF.clear(url);
+        }
       };
     }, [url]);
     
@@ -448,24 +581,86 @@ import {
       <div
         style={{
           position: "relative",
-          width: width,
-          height: height,
+          width: typeof width === 'number' ? `${width}px` : width,
+          height: typeof height === 'number' ? `${height}px` : height,
+          maxWidth: '100%',
+          margin: '0 auto'
         }}
         onWheel={(e) => enableManualZoom ? null : e.stopPropagation()}
       >
         {error && (
-          <div style={{ color: "red", position:  "absolute", top: 0, left: 0, zIndex: 100 }}>
+          <div style={{ 
+            color: "red", 
+            position: "absolute", 
+            top: 0, 
+            left: 0, 
+            zIndex: 100, 
+            background: "rgba(0,0,0,0.7)",
+            padding: "10px",
+            borderRadius: "5px",
+            maxWidth: "90%"
+          }}>
             Error loading model: {error}
+          </div>
+        )}
+        
+        {loading && (
+          <div style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 100,
+            background: "rgba(0,0,0,0.7)",
+            padding: "10px",
+            borderRadius: "5px",
+            color: "white"
+          }}>
+            Loading model...
           </div>
         )}
         <Canvas
           ref={canvasRef}
-          camera={{ position: [0, 0, 4], fov: 45 }}
+          camera={{ position: [0, 0, 50], fov: 30 }}
           style={{ background: "transparent", touchAction: enableManualZoom ? "auto" : "none" }}
-          gl={{ preserveDrawingBuffer: true }}
+          gl={{ 
+            preserveDrawingBuffer: true,
+            powerPreference: "high-performance",
+            antialias: true,
+            alpha: true,
+            stencil: false,
+            depth: true
+          }}
           shadows
+          dpr={[1, 1.5]} // Limit pixel ratio for better performance
+          frameloop="demand" // Only render when needed
+          onCreated={({ gl, camera, scene }) => {
+            gl.setClearColor(0x000000, 0);
+            
+            // Handle context loss and restoration
+            const canvas = gl.domElement;
+            canvas.addEventListener('webglcontextlost', (event) => {
+              event.preventDefault();
+              console.log('WebGL context lost. Trying to restore...');
+            }, false);
+            
+            canvas.addEventListener('webglcontextrestored', () => {
+              console.log('WebGL context restored.');
+            }, false);
+            
+            // Store references
+            if (rendererRef) rendererRef.current = gl;
+            if (cameraRef) cameraRef.current = camera;
+            if (sceneRef) sceneRef.current = scene;
+          }}
         >
-          <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>
+          {/* Use a simple fallback instead of the Loader component */}
+          <Suspense fallback={
+            <mesh>
+              <sphereGeometry args={[1, 16, 16]} />
+              <meshStandardMaterial color="gray" />
+            </mesh>
+          }>
             <ModelInner
               url={url}
               xOff={modelXOffset}
@@ -506,7 +701,8 @@ import {
               intensity={rimLightIntensity}
               position={[0, -10, 0]}
             />
-            <Environment preset={environmentPreset} />
+            {/* Simplify the Environment component */}
+            {environmentPreset !== "none" && <Environment preset={environmentPreset} background={false} />}
             <ContactShadows
               ref={contactRef}
               rotation={[-Math.PI / 2, 0, 0]}

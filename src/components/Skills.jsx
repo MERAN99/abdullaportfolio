@@ -6,6 +6,7 @@ import { SiJavascript, SiTailwindcss, SiExpress, SiUnrealengine, SiBlender } fro
 import { useTheme } from '../context/ThemeContext';
 import useEmblaCarousel from 'embla-carousel-react';
 import './embla-carousel.css';
+import ScrollStack,{  ScrollStackItem } from './Animations/StackViewer/ScrollStack';
 
 // Simple skill item component
 const SkillItem = ({ icon, name, isDarkMode }) => {
@@ -203,6 +204,7 @@ const Skills = () => {
       ]
     }
   ];
+  //  
 
   return (
     <section id="skills" className="py-12">
@@ -216,8 +218,8 @@ const Skills = () => {
         >
           Skills
         </motion.h2>
+<SkillCarousel categories={skillCategories} isDarkMode={isDarkMode} />
 
-        <SkillCarousel categories={skillCategories} isDarkMode={isDarkMode} />
       </div>
     </section>
   );
