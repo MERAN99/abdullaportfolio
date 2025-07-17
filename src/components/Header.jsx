@@ -53,7 +53,7 @@ const Header = () => {
             <div>
               
                    <SplitText
-                    text="Abdulla Mohammed Ahmed"
+                    text="Abdulla.Dev"
                     className="text-5xl font-semibold text-center text-blue-300 "
                     delay={100}
                     duration={0.6}

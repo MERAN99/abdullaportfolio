@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import LottieMoon from './LottieMoon';
 import StarsBackground from './StarsBackground';
-import SimpleModelViewer from './3D/SimpleModelViewer';
+import OptimizedImage from './OptimizedImage';
+import LoadingIndicator from './LoadingIndicator';
 import './about.css'; // Import the CSS file for animations
+
+// Lazy load the 3D model viewer to improve initial page load
+const SimpleModelViewer = lazy(() => import('./3D/SimpleModelViewer'));
 
 const About = () => {
   const { isDarkMode } = useTheme();
   const [dimensions, setDimensions] = useState({ width: 500, height: 500 });
+  const [isModelVisible, setIsModelVisible] = useState(false);
   
   // Update dimensions based on screen size
   useEffect(() => {
@@ -34,6 +39,30 @@ const About = () => {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
   
+  // Use Intersection Observer to load the model only when it's visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsModelVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    const section = document.getElementById('about');
+    if (section) {
+      observer.observe(section);
+    }
+    
+    return () => {
+      if (section) {
+        observer.unobserve(section);
+      }
+    };
+  }, []);
+  
   return (
     <section 
       id="about"   
@@ -52,17 +81,27 @@ const About = () => {
       
       <div className="container mx-auto px-4 relative z-10 flex flex-col md:flex-row justify-between items-center">
         <div className="max-w-2xl mb-10 md:mb-0 md:w-1/2 lg:w-2/5 md:pr-8 relative">
-          {/* Astronaut background image */}
-          <div 
-            className="absolute inset-0 z-0 astronaut-float" 
-            style={{
-              backgroundImage: 'url(/images/astronout.png)',
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              opacity: 0.5,
-            }}
-          ></div>
+          {/* Astronaut background image using OptimizedImage */}
+          <div className="absolute inset-0 z-0 astronaut-float" style={{ overflow: 'visible' }}>
+            <OptimizedImage 
+              src="/images/astronout.png" 
+              alt="Astronaut floating" 
+              style={{
+                width: '80%',
+                height: 'auto',
+                objectFit: 'contain',
+                opacity: 0.5,
+                margin: 'auto',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                maxHeight: '100%',
+              }}
+              priority={true} // Load with high priority as it's above the fold
+              lowQualitySrc="/images/astronout.png?quality=5&w=20" // Very low quality placeholder
+            />
+          </div>
           
           {/* Content with relative positioning to appear above the background */}
           <div className="relative z-10">
@@ -102,22 +141,24 @@ const About = () => {
           </div>
         </div>
         
-         <div className="mt-8 md:mt-0 flex justify-center items-center w-full md:w-1/2 lg:w-3/5 md:pl-8">
-           <div className="w-full h-full flex justify-center items-center" style={{ minHeight: '600px' }}>
-             <SimpleModelViewer
-            url="/models/Moon.glb"
-            width={dimensions.width}
-            height={dimensions.height}
-            environmentPreset="sunset"
-            modelScale={8.0}
-          />
+        <div className="mt-8 md:mt-0 flex justify-center items-center w-full md:w-1/2 lg:w-3/5 md:pl-8">
+          <div className="w-full h-full flex justify-center items-center" style={{ minHeight: '600px' }}>
+            {isModelVisible ? (
+              <Suspense fallback={<LoadingIndicator message="Loading 3D model..." />}>
+                <SimpleModelViewer
+                  url="/models/Moon.glb"
+                  width={dimensions.width}
+                  height={dimensions.height}
+                  environmentPreset="sunset"
+                  modelScale={8.0}
+                />
+              </Suspense>
+            ) : (
+              <LoadingIndicator message="Scroll to view 3D model" />
+            )}
           </div>
         </div>
-
-
       </div>
-
-    
     </section>
   );
 };

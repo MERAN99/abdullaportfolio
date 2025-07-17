@@ -1,0 +1,12 @@
+/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, OPTIONS
+  Access-Control-Allow-Headers: *
+
+/models/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000
+  
+/images/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000 
