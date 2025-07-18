@@ -12,13 +12,38 @@ import * as THREE from 'three';
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true }) {
+  // Adjust FOV based on screen size
+  const [mobileFov, setMobileFov] = useState(fov);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      // Increase FOV on smaller screens to make the lanyard more visible
+      const isMobile = window.innerWidth < 768;
+      setMobileFov(isMobile ? fov * 1.3 : fov);
+    };
+    
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [fov]);
+  
   return (
-    <div className="relative w-full h-screen flex justify-center items-center transform scale-100 origin-center" style={{ zIndex: 100, pointerEvents: 'auto' }}>
+    <div className="relative w-full h-screen flex justify-center items-center transform scale-100 origin-center" 
+      style={{ 
+        zIndex: 100, 
+        pointerEvents: 'auto',
+        touchAction: 'none' // Prevent default touch actions like scrolling while interacting
+      }}
+    >
       <Canvas
-        camera={{ position: position, fov: fov }}
-        gl={{ alpha: transparent }}
-        onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+        camera={{ position: position, fov: mobileFov }}
+        gl={{ alpha: transparent, antialias: true, powerPreference: 'high-performance' }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1);
+          gl.physicallyCorrectLights = true;
+        }}
         style={{ pointerEvents: 'auto' }}
+        dpr={[1, 2]} // Responsive pixel ratio for better performance
       >
         <ambientLight intensity={Math.PI} />
         <Physics gravity={gravity} timeStep={1 / 60}>
@@ -43,12 +68,13 @@ function IDCard() {
   useEffect(() => {
     if (educationTexture) {
       // Configure texture
+      // Set rotation center to middle of texture
       educationTexture.needsUpdate = true;
     }
   }, [educationTexture]);
   
   return (
-    <mesh ref={meshRef} renderOrder={1000} rotation={[0, Math.PI, 0]}>
+    <mesh ref={meshRef} renderOrder={1000} rotation={[0, 0, 0]}>
       <planeGeometry args={[1.6, 2.25]} />
       <meshPhysicalMaterial 
         map={educationTexture} 
@@ -129,6 +155,19 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   curve.curveType = 'chordal';
   lanyardTexture.wrapS = lanyardTexture.wrapT = THREE.RepeatWrapping;
 
+  // Handle both mouse and touch events
+  const handlePointerDown = (e) => {
+    e.stopPropagation();
+    e.target.setPointerCapture(e.pointerId);
+    drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
+  };
+
+  const handlePointerUp = (e) => {
+    e.stopPropagation();
+    e.target.releasePointerCapture(e.pointerId);
+    drag(false);
+  };
+
   return (
     <>
       <group position={[0, 4, 0]}>
@@ -149,8 +188,10 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
             position={[0, -1.2, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
-            onPointerUp={(e) => (e.target.releasePointerCapture(e.pointerId), drag(false))}
-            onPointerDown={(e) => (e.target.setPointerCapture(e.pointerId), drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation()))))}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onTouchStart={handlePointerDown}
+            onTouchEnd={handlePointerUp}
           >
             <IDCard />
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} renderOrder={1001} />
@@ -167,7 +208,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
           useMap
           map={lanyardTexture}
           repeat={[-4, 1]}
-          lineWidth={1}
+          lineWidth={isSmall ? 1.5 : 1} // Slightly thicker line on mobile
         />
       </mesh>
     </>

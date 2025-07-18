@@ -1,15 +1,27 @@
 import { motion } from 'framer-motion';
 import { FaGraduationCap, FaUniversity, FaCalendarAlt, FaPalette } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
-import Lanyard from './3D/Lanyard'
+import Lanyard from './3D/Lanyard';
+import { useState, useEffect } from 'react';
 
 const Education = () => {
   const { isDarkMode } = useTheme();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile(); // Initial check
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   return (
     <section 
       id="education" 
-      className=" relative h-120 flex items-center"
+      className="relative h-screen flex items-center"
       style={{
         backgroundImage: 'url("/images/astronout_Book.jpeg")',
         backgroundSize: 'cover',
@@ -37,8 +49,6 @@ const Education = () => {
         >
           Education
         </motion.h2>
-
-       
       </div>
       
       {/* Lanyard component on top layer */}
@@ -48,10 +58,12 @@ const Education = () => {
           pointerEvents: 'auto'
         }}
       >
-        <Lanyard position={[0, 0, 38]} gravity={[0, -40, 0]} />
+        <Lanyard 
+          position={[0, 0, isMobile ? 32 : 22]} 
+          gravity={[0, -40, 0]} 
+          fov={isMobile ? 12 : 25}
+        />
       </div>
-
-
     </section>
   );
 };
