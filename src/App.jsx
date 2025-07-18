@@ -7,6 +7,7 @@ import Experience from './components/Experience';
 import Education from './components/Education';
 import Languages from './components/Languages';
 import Footer from './components/Footer';
+import MusicPlayer from './components/MusicPlayer';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ParallaxBackground, ParallaxWrapper } from './components/ParallaxBackground';
 import SpaceBackground from './components/SpaceBackground';
@@ -67,6 +68,7 @@ const AppContent = () => {
       className={`min-h-screen ${isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-white text-gray-900'} transition-colors duration-300 no-scrollbar`}
     >
       <Navigation />
+      <MusicPlayer />
       
       <ParallaxWrapper>
         {/* Header section with space background */}

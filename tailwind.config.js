@@ -7,6 +7,10 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      height: {
+        '120': '30rem', // 480px
+        '150': '38rem', // 608px
+      },
       colors: {
         primary: {
           50: '#eef2ff',

@@ -28,7 +28,7 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
   }, [fov]);
   
   return (
-    <div className="relative w-full h-screen flex justify-center items-center transform scale-100 origin-center" 
+    <div className="relative w-full h-full flex justify-center items-center transform scale-100 origin-center" 
       style={{ 
         zIndex: 100, 
         pointerEvents: 'auto',
