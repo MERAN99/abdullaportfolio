@@ -10,6 +10,9 @@ import Footer from './components/Footer';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ParallaxBackground, ParallaxWrapper } from './components/ParallaxBackground';
 import SpaceBackground from './components/SpaceBackground';
+import {BlinkBlur} from 'react-loading-indicators';
+
+
 import './index.css';
 import './gradient.css';
 
@@ -50,7 +53,10 @@ const AppContent = () => {
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black">
-        <div className="text-3xl text-white font-bold">Loading...</div>
+        <div className="flex flex-col items-center">
+        <BlinkBlur color="#a5dbfb" size="large" text="Loading" textColor="#ffffff" />
+        
+        </div>
       </div>
     );
   }
