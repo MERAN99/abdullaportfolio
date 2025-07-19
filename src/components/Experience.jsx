@@ -268,7 +268,13 @@ const Experience = () => {
           style={{ 
             height: '50vh', 
             position: 'relative',
-            zIndex: 1
+            zIndex: 1,
+            width: '90%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            margin: '0 auto'
           }}
           ref={scrollStackRef}
         >

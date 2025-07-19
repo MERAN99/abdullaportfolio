@@ -201,7 +201,7 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
               <motion.div 
                 className="embla__slide__inner relative overflow-hidden"
                 style={{ 
-                  backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.01)' : 'rgba(255, 255, 255, 0.08)',
                   backdropFilter: 'blur(16px)',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                   borderRadius: '0.75rem',
