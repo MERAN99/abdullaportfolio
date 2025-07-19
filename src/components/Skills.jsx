@@ -65,7 +65,7 @@ const SkillItem = ({ icon, name, isDarkMode }) => {
             : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.8) 100%)',
           boxShadow: isHovered 
             ? `0 4px 8px rgba(0,0,0,0.15), 
-               inset 0 -2px 5px ${isDarkMode ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)'}, 
+               inset 0 -2px 5px ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.1)'}, 
                inset 0 2px 5px ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'}` 
             : `0 2px 4px rgba(0,0,0,0.1), 
                inset 0 -1px 3px ${isDarkMode ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)'}, 
@@ -201,8 +201,8 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
               <motion.div 
                 className="embla__slide__inner relative overflow-hidden"
                 style={{ 
-                  backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.5)' : 'rgba(255, 255, 255, 0.12)',
-                  backdropFilter: 'blur(12px)',
+                  backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(16px)',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                   borderRadius: '0.75rem',
                   padding: '1.3rem',
@@ -213,29 +213,29 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
                   boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1)'
                 }}
               >
-                {/* Enhanced glossy effect overlay */}
+                {/* Enhanced glossy effect overlay with reduced opacity */}
                 <div 
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background: `
                       linear-gradient(to bottom, 
-                        rgba(255, 255, 255, ${isDarkMode ? '0.25' : '0.45'}) 0%, 
-                        rgba(255, 255, 255, 0.05) 30%, 
-                        rgba(${isDarkMode ? '0, 0, 0' : '255, 255, 255'}, 0.05) 70%, 
-                        rgba(${isDarkMode ? '0, 0, 0' : '255, 255, 255'}, ${isDarkMode ? '0.15' : '0.2'}) 100%
+                        rgba(255, 255, 255, ${isDarkMode ? '0.15' : '0.25'}) 0%, 
+                        rgba(255, 255, 255, 0.03) 30%, 
+                        rgba(${isDarkMode ? '0, 0, 0' : '255, 255, 255'}, 0.03) 70%, 
+                        rgba(${isDarkMode ? '0, 0, 0' : '255, 255, 255'}, ${isDarkMode ? '0.1' : '0.15'}) 100%
                       )
                     `,
                     borderRadius: '0.75rem',
                   }}
                 ></div>
                 
-                {/* Side edge glossy effect */}
+                {/* Side edge glossy effect with reduced opacity */}
                 <div 
                   className="absolute top-0 bottom-0 right-0 w-1/4 pointer-events-none"
                   style={{
                     background: `
                       linear-gradient(to left, 
-                        rgba(255, 255, 255, ${isDarkMode ? '0.1' : '0.2'}) 0%, 
+                        rgba(255, 255, 255, ${isDarkMode ? '0.07' : '0.15'}) 0%, 
                         rgba(255, 255, 255, 0) 100%
                       )
                     `,
@@ -277,28 +277,34 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
         </div>
       </div>
 
-      {/* Navigation buttons */}
+      {/* Navigation buttons with reduced opacity */}
       <button 
         className={`embla__button embla__button--prev ${
-          isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'
-        }`} 
+          isDarkMode ? 'bg-gray-800/60 text-gray-200' : 'bg-white/60 text-gray-800'
+        } backdrop-filter backdrop-blur-sm`} 
         onClick={scrollPrev}
-        style={{ width: '2.5rem', height: '2.5rem' }} // Smaller buttons
+        style={{ 
+          width: '2.5rem', 
+          height: '2.5rem',
+          border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+        }}
       >
         <FaArrowLeft size={16} />
       </button>
       
       <button 
         className={`embla__button embla__button--next ${
-          isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'
-        }`} 
+          isDarkMode ? 'bg-gray-800/60 text-gray-200' : 'bg-white/60 text-gray-800'
+        } backdrop-filter backdrop-blur-sm`} 
         onClick={scrollNext}
-        style={{ width: '2.5rem', height: '2.5rem' }} // Smaller buttons
+        style={{ 
+          width: '2.5rem', 
+          height: '2.5rem',
+          border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+        }}
       >
         <FaArrowRight size={16} />
       </button>
-
-
     </div>
   );
 };
