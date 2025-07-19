@@ -207,19 +207,30 @@ const Skills = () => {
   //  
 
   return (
-    <section id="skills" className="py-12">
-      <div className="container mx-auto px-4">
+    <section id="skills" className="py-12 relative">
+      {/* Wallpaper background with dark overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center" 
+        style={{ 
+          backgroundImage: 'url("/images/wallpaper.jpg")',
+          height: '100%'
+        }}
+      >
+        {/* Dark overlay */}
+        <div className={`absolute inset-0 ${isDarkMode ? 'bg-black/70' : 'bg-black/50'}`}></div>
+      </div>
+      
+      <div className="container mx-auto px-4 relative z-10">
         <motion.h2 
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className={`section-title text-center mb-8 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
+          className="section-title text-center mb-8 text-white"
         >
           Skills
         </motion.h2>
-<SkillCarousel categories={skillCategories} isDarkMode={isDarkMode} />
-
+        <SkillCarousel categories={skillCategories} isDarkMode={isDarkMode} />
       </div>
     </section>
   );
