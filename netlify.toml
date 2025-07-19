@@ -25,4 +25,24 @@
     Pragma = "no-cache"
     Expires = "0"
     Netlify-CDN-Cache-Control = "no-cache, no-store, must-revalidate"
-    Cache-Tag = "png-files" 
+    Cache-Tag = "png-files"
+    X-Cache-Invalidate = "true"
+
+# Add specific headers for individual PNG files
+[[headers]]
+  for = "/models/education-lanyard.png"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+    Netlify-CDN-Cache-Control = "no-cache, no-store, must-revalidate"
+    X-Cache-Invalidate = "true"
+    
+[[headers]]
+  for = "/models/lanyard.png"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+    Netlify-CDN-Cache-Control = "no-cache, no-store, must-revalidate"
+    X-Cache-Invalidate = "true" 
