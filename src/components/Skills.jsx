@@ -56,19 +56,75 @@ const SkillItem = ({ icon, name, isDarkMode }) => {
         setMousePosition({ x: 0, y: 0 });
       }}
     >
-      <div className="text-center relative z-10">
-        {icon}
+      {/* Enhanced icon container with glossy effect */}
+      <div 
+        className="text-center relative z-10 p-3 rounded-full"
+        style={{
+          background: isDarkMode 
+            ? 'linear-gradient(135deg, rgba(60, 60, 70, 0.8) 0%, rgba(30, 30, 40, 0.8) 100%)' 
+            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.8) 100%)',
+          boxShadow: isHovered 
+            ? `0 4px 8px rgba(0,0,0,0.15), 
+               inset 0 -2px 5px ${isDarkMode ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)'}, 
+               inset 0 2px 5px ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'}` 
+            : `0 2px 4px rgba(0,0,0,0.1), 
+               inset 0 -1px 3px ${isDarkMode ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)'}, 
+               inset 0 1px 3px ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.3)'}`,
+          transform: isHovered ? `translateZ(10px) translateX(${mousePosition.x * -3}px) translateY(${mousePosition.y * -3}px)` : 'translateZ(0)',
+          transition: 'all 0.2s ease-out',
+        }}
+      >
+        {/* Icon with glow effect */}
+        <div 
+          style={{
+            filter: isHovered ? 'drop-shadow(0 0 3px rgba(255,255,255,0.3))' : 'none',
+            transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+            transition: 'all 0.2s ease-out',
+          }}
+        >
+          {icon}
+        </div>
+        
+        {/* Icon glossy highlight */}
+        <div 
+          className="absolute inset-0 rounded-full opacity-60 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%)',
+            transform: isHovered ? `rotate(${mousePosition.x * 20}deg)` : 'rotate(0deg)',
+            transition: 'transform 0.2s ease-out',
+          }}
+        ></div>
       </div>
-      <span className={`mt-2 text-xs font-medium relative z-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+      
+      <span className={`mt-3 text-xs font-medium relative z-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
         {name}
       </span>
       
-      {/* Glossy highlight effect */}
+      {/* Enhanced glossy highlight effect */}
       <div 
-        className="absolute inset-0 rounded-md opacity-30 bg-gradient-to-t from-transparent via-transparent to-white"
+        className="absolute inset-0 rounded-md pointer-events-none"
         style={{
+          background: `linear-gradient(
+            ${135 + (mousePosition.x * 30)}deg, 
+            rgba(255,255,255,${isDarkMode ? '0.15' : '0.4'}) 0%, 
+            rgba(255,255,255,0) 50%, 
+            rgba(255,255,255,0) 100%
+          )`,
+          opacity: isHovered ? 0.8 : 0.3,
           transform: isHovered ? `translateX(${mousePosition.x * 5}px) translateY(${mousePosition.y * 5}px)` : 'none',
-          transition: 'transform 0.2s ease-out',
+          transition: 'all 0.2s ease-out',
+        }}
+      ></div>
+      
+      {/* Bottom edge highlight */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-1/4 rounded-b-md pointer-events-none"
+        style={{
+          background: `linear-gradient(to top, 
+            rgba(${isDarkMode ? '40,40,50' : '255,255,255'},0.2) 0%, 
+            rgba(${isDarkMode ? '40,40,50' : '255,255,255'},0) 100%
+          )`,
+          opacity: isHovered ? 0.8 : 0.4,
         }}
       ></div>
     </motion.div>
@@ -145,28 +201,55 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
               <motion.div 
                 className="embla__slide__inner relative overflow-hidden"
                 style={{ 
-                  backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.7)' : 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(8px)',
+                  backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.5)' : 'rgba(255, 255, 255, 0.12)',
+                  backdropFilter: 'blur(12px)',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                   borderRadius: '0.75rem',
                   padding: '1.3rem',
                   height: '100%',
-                  border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+                  border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.4)'}`,
                 }}
                 whileHover={{ 
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1)'
                 }}
               >
-                {/* Glossy effect overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none rounded-t-lg" 
-                     style={{ height: '30%', top: 0 }}></div>
+                {/* Enhanced glossy effect overlay */}
+                <div 
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: `
+                      linear-gradient(to bottom, 
+                        rgba(255, 255, 255, ${isDarkMode ? '0.25' : '0.45'}) 0%, 
+                        rgba(255, 255, 255, 0.05) 30%, 
+                        rgba(${isDarkMode ? '0, 0, 0' : '255, 255, 255'}, 0.05) 70%, 
+                        rgba(${isDarkMode ? '0, 0, 0' : '255, 255, 255'}, ${isDarkMode ? '0.15' : '0.2'}) 100%
+                      )
+                    `,
+                    borderRadius: '0.75rem',
+                  }}
+                ></div>
+                
+                {/* Side edge glossy effect */}
+                <div 
+                  className="absolute top-0 bottom-0 right-0 w-1/4 pointer-events-none"
+                  style={{
+                    background: `
+                      linear-gradient(to left, 
+                        rgba(255, 255, 255, ${isDarkMode ? '0.1' : '0.2'}) 0%, 
+                        rgba(255, 255, 255, 0) 100%
+                      )
+                    `,
+                    borderTopRightRadius: '0.75rem',
+                    borderBottomRightRadius: '0.75rem',
+                  }}
+                ></div>
                 
                 <h3 className={`text-sm sm:text-lg font-semibold mb-4 bg-gradient-to-r ${
                   index === 0 ? 'from-blue-600 via-indigo-500 to-purple-500' : 
                   index === 1 ? 'from-purple-600 via-pink-500 to-red-500' : 
                   index === 2 ? 'from-indigo-600 via-blue-500 to-cyan-500' : 
                   'from-indigo-600 via-blue-500 to-cyan-500'
-                } inline-block text-transparent bg-clip-text relative z-10`}>{category.title}</h3>
+                } inline-block text-transparent bg-clip-text relative z-10 drop-shadow-sm`}>{category.title}</h3>
                 
                 <motion.div
                   variants={containerVariants}
