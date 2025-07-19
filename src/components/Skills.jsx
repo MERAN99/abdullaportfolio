@@ -8,21 +8,69 @@ import useEmblaCarousel from 'embla-carousel-react';
 import './embla-carousel.css';
 import ScrollStack,{  ScrollStackItem } from './Animations/StackViewer/ScrollStack';
 
-// Simple skill item component
+// Simple skill item component with parallax effect
 const SkillItem = ({ icon, name, isDarkMode }) => {
+  const cardRef = useRef(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Calculate rotation based on mouse position
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Calculate distance from center (normalized to -1 to 1)
+    const x = (e.clientX - centerX) / (rect.width / 2);
+    const y = (e.clientY - centerY) / (rect.height / 2);
+    
+    setMousePosition({ x, y });
+  };
+
   return (
     <motion.div
-      className={`flex flex-col items-center justify-center p-5 rounded-md transition-colors ${
-        isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-      }`}
+      ref={cardRef}
+      className={`flex flex-col items-center justify-center p-5 rounded-md transition-all 
+        ${isDarkMode ? 'hover:bg-gray-700/60' : 'hover:bg-white/60'} 
+        backdrop-filter backdrop-blur-sm 
+        ${isHovered ? 'shadow-lg' : 'shadow-md'} 
+        border border-opacity-20 ${isDarkMode ? 'border-gray-500/30' : 'border-white/30'}
+        bg-gradient-to-br ${isDarkMode ? 'from-gray-800/70 to-gray-900/70' : 'from-white/70 to-gray-100/70'}
+      `}
+      style={{
+        transform: isHovered ? `perspective(1000px) rotateX(${mousePosition.y * 10}deg) rotateY(${-mousePosition.x * 10}deg)` : 'none',
+        transition: 'transform 0.2s ease-out',
+        boxShadow: isHovered ? 
+          `0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23), 
+           inset 0 -3px 8px ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.4)'},
+           inset 0 3px 8px ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.2)'}` : 
+          `0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)`,
+      }}
       whileHover={{ scale: 1.05 }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setMousePosition({ x: 0, y: 0 });
+      }}
     >
-      <div className="text-center">
+      <div className="text-center relative z-10">
         {icon}
       </div>
-      <span className={`mt-2 text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+      <span className={`mt-2 text-xs font-medium relative z-10 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
         {name}
       </span>
+      
+      {/* Glossy highlight effect */}
+      <div 
+        className="absolute inset-0 rounded-md opacity-30 bg-gradient-to-t from-transparent via-transparent to-white"
+        style={{
+          transform: isHovered ? `translateX(${mousePosition.x * 5}px) translateY(${mousePosition.y * 5}px)` : 'none',
+          transition: 'transform 0.2s ease-out',
+        }}
+      ></div>
     </motion.div>
   );
 };
@@ -94,29 +142,38 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
         <div className="embla__container">
           {categories.map((category, index) => (
             <div key={index} className="embla__slide">
-              <div 
-                className="embla__slide__inner"
+              <motion.div 
+                className="embla__slide__inner relative overflow-hidden"
                 style={{ 
-                  backgroundColor: isDarkMode ? 'rgb(31, 41, 55)' : 'rgba(83, 76, 76, 0.06)',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(209, 201, 201, 0.06)',
+                  backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.7)' : 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                   borderRadius: '0.75rem',
                   padding: '1.3rem',
-                  height: '100%'
+                  height: '100%',
+                  border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+                }}
+                whileHover={{ 
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
                 }}
               >
+                {/* Glossy effect overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none rounded-t-lg" 
+                     style={{ height: '30%', top: 0 }}></div>
+                
                 <h3 className={`text-sm sm:text-lg font-semibold mb-4 bg-gradient-to-r ${
                   index === 0 ? 'from-blue-600 via-indigo-500 to-purple-500' : 
                   index === 1 ? 'from-purple-600 via-pink-500 to-red-500' : 
                   index === 2 ? 'from-indigo-600 via-blue-500 to-cyan-500' : 
                   'from-indigo-600 via-blue-500 to-cyan-500'
-                } inline-block text-transparent bg-clip-text`}>{category.title}</h3>
+                } inline-block text-transparent bg-clip-text relative z-10`}>{category.title}</h3>
                 
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="grid grid-cols-2 gap-3"
+                  className="grid grid-cols-2 gap-3 relative z-10"
                 >
                   {category.skills.map((skill, skillIndex) => (
                     <motion.div
@@ -131,7 +188,7 @@ const SkillCarousel = ({ categories, isDarkMode }) => {
                     </motion.div>
                   ))}
                 </motion.div>
-              </div>
+              </motion.div>
             </div>
           ))}
         </div>
