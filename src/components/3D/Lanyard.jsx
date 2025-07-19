@@ -62,7 +62,7 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
 
 // Custom ID card component
 function IDCard() {
-  const educationTexture = useTexture('/models/education-lanyard.png');
+  const educationTexture = useTexture("/models/education-lanyard.png?v=20250719");
   const meshRef = useRef();
   
   useEffect(() => {
@@ -96,7 +96,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   const { nodes, materials } = useGLTF('/models/card.glb');
   
   // Load the lanyard texture for the band
-  const lanyardTexture = useTexture('/models/lanyard.png');
+  const lanyardTexture = useTexture("/models/lanyard.png?v=20250719");
   
   const [curve] = useState(() => new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]));
   const [dragged, drag] = useState(false);
