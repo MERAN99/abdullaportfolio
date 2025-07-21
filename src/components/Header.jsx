@@ -54,7 +54,7 @@ const Header = () => {
               
                    <SplitText
                     text="Abdulla.Dev"
-                    className="text-5xl font-semibold text-center text-blue-300 "
+                    className="text-5xl font-semibold text-center z-60 text-blue-300 "
                     delay={100}
                     duration={0.6}
                     ease="power3.out"
@@ -71,7 +71,7 @@ const Header = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="text-xl md:text-2xl mt-4 text-white"
+                className="text-xl md:text-2xl z-50000000000 mt-4 text-white"
                 style={{
                   transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
                   textShadow: '0 0 20px rgba(100, 100, 255, 0.4)'

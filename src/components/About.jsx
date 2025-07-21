@@ -104,9 +104,9 @@ const About = () => {
           </div>
           
           {/* Content with relative positioning to appear above the background */}
-          <div className="relative z-10">
+          <div className="relative">
             <h2 
-              className="text-4xl md:text-5xl font-bold mb-8" 
+              className="text-4xl z-99999999 md:text-5xl font-bold mb-8" 
               style={{ 
                 fontFamily: 'Raleway, sans-serif',
                 background: 'linear-gradient(to right,rgb(31, 69, 194), #fbd786, #f7797d)',
@@ -119,7 +119,7 @@ const About = () => {
               Professional Summary
             </h2>
             
-            <div className="space-y-6 text-lg">
+            <div className="space-y-6 z-99999999 text-lg">
               <p>
                 I'm a passionate Full Stack Developer with expertise in building modern web applications 
                 using cutting-edge technologies. My journey in software development has equipped me with 

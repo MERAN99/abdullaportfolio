@@ -366,13 +366,13 @@ const Skills = () => {
         <div className={`absolute inset-0 ${isDarkMode ? 'bg-black/70' : 'bg-black/50'}`}></div>
       </div>
       
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-10000">
         <motion.h2 
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="section-title text-center mb-8 text-white"
+          className="section-title text-center mb-8 text-red z-9999999"
         >
           Skills
         </motion.h2>

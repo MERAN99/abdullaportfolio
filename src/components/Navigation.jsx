@@ -121,14 +121,14 @@ const Navigation = () => {
 
   return (
     <nav 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 glossy-nav ${
+      className={`fixed top-0  left-0 w-full z-5000000 transition-all duration-300 glossy-nav ${
         scrolled 
           ? isDarkMode ? 'py-2 border-b border-blue-900/30' : 'py-2 border-b border-blue-300/30'
           : 'py-4'
       }`}
       style={{
         background: scrolled 
-          ? (isDarkMode ? 'rgba(15, 23, 42, 0.75)' : 'rgba(30, 41, 59, 0.65)') 
+          ? (isDarkMode ? 'rgba(15, 23, 42, 0.15)' : 'rgba(30, 41, 59, 0.25)') 
           : 'rgba(15, 23, 42, 0.5)',
         boxShadow: scrolled 
           ? (isDarkMode ? '0 4px 30px rgba(0, 0, 0, 0.3)' : '0 4px 30px rgba(59, 130, 246, 0.2)')

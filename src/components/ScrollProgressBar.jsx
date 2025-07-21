@@ -64,39 +64,17 @@ const ScrollProgressBar = () => {
     };
   }, []);
   
-  // Generate wave patterns for the full document height
-  const generateWavePath = () => {
-    // We'll create a pattern that can be repeated vertically
-    const patternHeight = 500; // Height of a single pattern in SVG units
-    const waveHeight = 8; // Max wave amplitude
-    
-    // Create a pattern that can be tiled vertically
-    let path = `M 1,0`; // Start at top
-    
-    // Create 5 segments in our pattern
-    for (let i = 0; i < 5; i++) {
-      const segmentStart = (i / 5) * patternHeight;
-      const segmentEnd = ((i + 1) / 5) * patternHeight;
-      const segmentMid = (segmentStart + segmentEnd) / 2;
-      
-      // Every other segment has a wave
-      if (i % 2 === 1) {
-        // Control points for smooth curve
-        path += ` C 1,${segmentStart + 50} ${waveHeight + 1},${segmentMid - 50} ${waveHeight + 1},${segmentMid}`;
-        path += ` C ${waveHeight + 1},${segmentMid + 50} 1,${segmentEnd - 50} 1,${segmentEnd}`;
-      } else {
-        path += ` L 1,${segmentEnd}`;
-      }
-    }
-    
-    return path;
+  // Constants for straight line pattern
+  const patternHeight = 1000; // Height of a single pattern in SVG units
+  
+  // Generate straight line path
+  const generateStraightLinePath = () => {
+    // Create a simple straight vertical line
+    return `M 1,0 L 1,${patternHeight}`;
   };
   
   // Generate background and progress SVG paths
-  const wavePath = generateWavePath();
-
-  // Calculate dot position based on scroll progress
-  const dotPosition = useTransform(scrollYProgress, value => value * viewportHeight);
+  const straightLinePath = generateStraightLinePath();
 
   // Calculate clip path for the progress indicator
   const clipPathHeight = useTransform(smoothProgress, value => `${value * 100}%`);
@@ -107,23 +85,12 @@ const ScrollProgressBar = () => {
   const nodeColor = isDarkMode ? 'rgba(180, 180, 180, 0.6)' : 'rgba(200, 200, 200, 0.7)';
   const activeNodeColor = 'white';
 
-  // Calculate wave offset at current scroll position (for dot positioning)
-  const waveOffset = useTransform(scrollYProgress, value => {
-    // Determine which segment of the pattern we're in
-    const patternPosition = (value * 5) % 5; // 5 segments in total
-    
-    // If in a wave segment (odd numbered segments)
-    if (Math.floor(patternPosition) % 2 === 1) {
-      // Calculate position within the segment (0-1)
-      const segmentProgress = patternPosition % 1;
-      
-      // Apply sine wave function to get horizontal offset
-      // This approximates the bezier curve with a sine wave
-      const offset = Math.sin(segmentProgress * Math.PI) * 8;
-      return offset;
-    }
-    
-    return 0; // No offset for straight segments
+  // Calculate dot position - always on the straight line
+  const dotPosition = useTransform(scrollYProgress, value => {
+    return {
+      x: 0, // Always centered on the line (x=1 in SVG)
+      y: value * 100 // As percentage for CSS positioning
+    };
   });
 
   return (
@@ -131,17 +98,18 @@ const ScrollProgressBar = () => {
       {/* Absolute container that spans the full document height */}
       <div 
         ref={containerRef}
-        className="absolute top-0 left-0 z-50 pointer-events-none"
+        className="absolute top-0 left-0 pointer-events-none"
         style={{ 
-          left: '20px', 
-          width: '20px',
+          left: '0', // Position at the very left edge
+          width: '4px', // Reduced width to fit at the edge
           height: documentHeight || '100%',
+          zIndex: 100, // Higher z-index to ensure visibility above text content
         }}
       >
-        {/* SVG container for continuous wave line */}
+        {/* SVG container for straight line */}
         <svg 
           ref={svgRef}
-          width="20" 
+          width="4" 
           height="100%" 
           preserveAspectRatio="none" 
           style={{ 
@@ -152,25 +120,27 @@ const ScrollProgressBar = () => {
             height: '100%',
           }}
         >
-          {/* Pattern definition for repeating waves */}
+          {/* Pattern definition for straight line */}
           <defs>
-            <pattern id="wavePattern" patternUnits="userSpaceOnUse" width="20" height="500" patternTransform="scale(1 1)">
+            <pattern id="straightLinePattern" patternUnits="userSpaceOnUse" width="4" height={patternHeight} patternTransform="scale(1 1)">
               <path
-                d={wavePath}
+                d={straightLinePath}
                 stroke={backgroundLineColor}
-                strokeWidth="2"
+                strokeWidth="4"
                 fill="none"
-                strokeLinecap="round"
+                strokeLinecap="square"
+                strokeLinejoin="miter"
               />
             </pattern>
             
-            <pattern id="wavePatternFill" patternUnits="userSpaceOnUse" width="20" height="500" patternTransform="scale(1 1)">
+            <pattern id="straightLinePatternFill" patternUnits="userSpaceOnUse" width="4" height={patternHeight} patternTransform="scale(1 1)">
               <path
-                d={wavePath}
+                d={straightLinePath}
                 stroke={progressLineColor}
-                strokeWidth="2"
+                strokeWidth="4"
                 fill="none"
-                strokeLinecap="round"
+                strokeLinecap="square"
+                strokeLinejoin="miter"
               />
             </pattern>
           </defs>
@@ -179,9 +149,9 @@ const ScrollProgressBar = () => {
           <rect 
             x="0" 
             y="0" 
-            width="20" 
+            width="4" 
             height="100%" 
-            fill="url(#wavePattern)"
+            fill="url(#straightLinePattern)"
             style={{
               filter: `drop-shadow(0 0 1px ${isDarkMode ? 'rgba(100, 100, 100, 0.3)' : 'rgba(150, 150, 150, 0.2)'})`
             }}
@@ -191,52 +161,59 @@ const ScrollProgressBar = () => {
           <motion.rect 
             x="0" 
             y="0" 
-            width="20" 
+            width="4" 
             height="100%" 
-            fill="url(#wavePatternFill)"
+            fill="url(#straightLinePatternFill)"
             style={{
               clipPath: `inset(0 0 ${useTransform(smoothProgress, p => `${100 - p * 100}%`)} 0)`,
               filter: `drop-shadow(0 0 3px ${isDarkMode ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.6)'})`
             }}
           />
           
-          {/* Grey circuit nodes at wave transitions */}
-          <circle cx="1" cy="20%" r="1.5" fill={nodeColor} style={{ filter: 'drop-shadow(0 0 1px rgba(150, 150, 150, 0.5))' }} />
-          <circle cx="1" cy="60%" r="1.5" fill={nodeColor} style={{ filter: 'drop-shadow(0 0 1px rgba(150, 150, 150, 0.5))' }} />
+          {/* Marker nodes along the line */}
+          <circle cx="2" cy="25%" r="1.5" fill={nodeColor} style={{ filter: 'drop-shadow(0 0 1px rgba(150, 150, 150, 0.5))' }} />
+          <circle cx="2" cy="50%" r="1.5" fill={nodeColor} style={{ filter: 'drop-shadow(0 0 1px rgba(150, 150, 150, 0.5))' }} />
+          <circle cx="2" cy="75%" r="1.5" fill={nodeColor} style={{ filter: 'drop-shadow(0 0 1px rgba(150, 150, 150, 0.5))' }} />
           
-          {/* White circuit nodes that appear based on scroll position */}
+          {/* Active nodes that appear based on scroll position */}
           <motion.circle 
-            cx="1" 
-            cy="20%" 
+            cx="2" 
+            cy="25%" 
             r="1.5" 
             fill={activeNodeColor}
             style={{ 
-              opacity: useTransform(smoothProgress, value => value > 0.2 ? 1 : 0),
+              opacity: useTransform(smoothProgress, value => value > 0.25 ? 1 : 0),
               filter: 'drop-shadow(0 0 2px white)' 
             }}
           />
           <motion.circle 
-            cx="1" 
-            cy="60%" 
+            cx="2" 
+            cy="50%" 
             r="1.5" 
             fill={activeNodeColor}
             style={{ 
-              opacity: useTransform(smoothProgress, value => value > 0.6 ? 1 : 0),
+              opacity: useTransform(smoothProgress, value => value > 0.5 ? 1 : 0),
+              filter: 'drop-shadow(0 0 2px white)' 
+            }}
+          />
+          <motion.circle 
+            cx="2" 
+            cy="75%" 
+            r="1.5" 
+            fill={activeNodeColor}
+            style={{ 
+              opacity: useTransform(smoothProgress, value => value > 0.75 ? 1 : 0),
               filter: 'drop-shadow(0 0 2px white)' 
             }}
           />
         </svg>
-      </div>
-      
-      {/* Fixed container for dot and readout */}
-      <div className="fixed top-0 left-0 z-50 pointer-events-none" style={{ left: '20px', width: '20px', height: '100vh' }}>
-        {/* Glowing dot that follows progress - positioned on the line */}
+
+        {/* Glowing dot that follows progress - positioned directly on the SVG */}
         <motion.div
           className="absolute z-10"
           style={{
-            left: useTransform(waveOffset, offset => `${offset}px`), // Dynamic horizontal position based on wave
-            top: 0,
-            y: dotPosition,
+            left: useTransform(dotPosition, pos => `${pos.x + 2}px`), // Adjusted to center on the line
+            top: useTransform(dotPosition, pos => `${pos.y}%`),
             scale: dotScale,
             opacity: dotOpacity,
           }}
@@ -247,6 +224,7 @@ const ScrollProgressBar = () => {
             style={{
               background: 'radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(200, 200, 255, 0.8) 100%)',
               boxShadow: '0 0 10px 2px rgba(255, 255, 255, 0.7)',
+              transform: 'translate(-50%, -50%)', // Center the dot on the line
             }}
           >
             {/* Animated pulse effect */}
@@ -277,10 +255,13 @@ const ScrollProgressBar = () => {
             />
           </div>
         </motion.div>
-        
+      </div>
+      
+      {/* Fixed container for readout */}
+      <div className="fixed bottom-4 left-4 z-50 pointer-events-none">
         {/* Digital readout */}
         <motion.div
-          className="fixed bottom-4 left-4 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-mono"
+          className="bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-mono"
           style={{
             color: 'rgba(255, 255, 255, 0.9)',
             opacity: useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0, 0.7, 0.7, 0]),
