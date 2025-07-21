@@ -207,7 +207,7 @@ const ScrollProgressBar = () => {
             }}
           />
         </svg>
-
+      
         {/* Glowing dot that follows progress - positioned directly on the SVG */}
         <motion.div
           className="absolute z-10"
@@ -256,7 +256,7 @@ const ScrollProgressBar = () => {
           </div>
         </motion.div>
       </div>
-      
+        
       {/* Fixed container for readout */}
       <div className="fixed bottom-4 left-4 z-50 pointer-events-none">
         {/* Digital readout */}
