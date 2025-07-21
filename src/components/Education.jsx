@@ -9,7 +9,9 @@ const Education = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [sectionHeight, setSectionHeight] = useState('38rem');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isInteracting, setIsInteracting] = useState(false);
   const sectionRef = useRef(null);
+  const interactionTimerRef = useRef(null);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -47,6 +49,22 @@ const Education = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Handle interaction state for scrolling vs card dragging
+  const handleInteractionStart = () => {
+    setIsInteracting(true);
+    // Clear any existing timer
+    if (interactionTimerRef.current) {
+      clearTimeout(interactionTimerRef.current);
+    }
+  };
+
+  const handleInteractionEnd = () => {
+    // Set a small delay before allowing scrolling again
+    interactionTimerRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, 300);
+  };
   
   return (
     <section 
@@ -61,6 +79,7 @@ const Education = () => {
         position: 'relative',
         height: sectionHeight,
         overflow: 'hidden',
+        touchAction: isInteracting ? 'none' : 'auto', // Only block touch actions when interacting with card
       }}
     >
       {/* Dark overlay */}
@@ -117,12 +136,30 @@ const Education = () => {
         </motion.h2>
       </div>
       
-      {/* Lanyard component on top layer */}
+      {/* Scroll instruction for mobile users */}
+      {isMobile && (
+        <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center items-center">
+          <motion.div 
+            className="bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            Tap card to interact • Swipe page to scroll
+          </motion.div>
+        </div>
+      )}
+      
+      {/* Lanyard component on top layer with interaction events */}
       <div 
-        className="absolute w-full h-full z-50 pointer-events-auto"
+        className="absolute w-full h-full z-50"
         style={{
           pointerEvents: 'auto',
         }}
+        onPointerDown={handleInteractionStart}
+        onPointerUp={handleInteractionEnd}
+        onTouchStart={handleInteractionStart}
+        onTouchEnd={handleInteractionEnd}
       >
         <Lanyard 
           position={[0, 0, isMobile ? 32 : 22]} 

@@ -32,7 +32,6 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
       style={{ 
         zIndex: 100, 
         pointerEvents: 'auto',
-        touchAction: 'none' // Prevent default touch actions like scrolling while interacting
       }}
     >
       <Canvas
@@ -104,6 +103,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   const [isSmall, setIsSmall] = useState(() =>
     typeof window !== 'undefined' && window.innerWidth < 1024
   );
+  const [touchStartTime, setTouchStartTime] = useState(0);
+  const [touchMoved, setTouchMoved] = useState(false);
 
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
@@ -155,16 +156,41 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   curve.curveType = 'chordal';
   lanyardTexture.wrapS = lanyardTexture.wrapT = THREE.RepeatWrapping;
 
-  // Handle both mouse and touch events
+  // Handle both mouse and touch events with improved detection
   const handlePointerDown = (e) => {
     e.stopPropagation();
     e.target.setPointerCapture(e.pointerId);
+    
+    // For touch events, record start time and reset movement flag
+    if (e.pointerType === 'touch') {
+      setTouchStartTime(Date.now());
+      setTouchMoved(false);
+    }
+    
     drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
+  };
+
+  const handlePointerMove = (e) => {
+    if (dragged && e.pointerType === 'touch') {
+      setTouchMoved(true);
+    }
   };
 
   const handlePointerUp = (e) => {
     e.stopPropagation();
     e.target.releasePointerCapture(e.pointerId);
+    
+    // For touch events, check if it was a quick tap without much movement
+    // If so, don't trigger drag to allow for scrolling
+    if (e.pointerType === 'touch') {
+      const touchDuration = Date.now() - touchStartTime;
+      if (touchDuration < 200 && !touchMoved) {
+        // This was a quick tap, don't interfere with scrolling
+        drag(false);
+        return;
+      }
+    }
+    
     drag(false);
   };
 
@@ -189,9 +215,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
-            onTouchStart={handlePointerDown}
-            onTouchEnd={handlePointerUp}
           >
             <IDCard />
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} renderOrder={1001} />
