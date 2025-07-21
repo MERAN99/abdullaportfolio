@@ -12,7 +12,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ParallaxBackground, ParallaxWrapper } from './components/ParallaxBackground';
 import SpaceBackground from './components/SpaceBackground';
 import {BlinkBlur} from 'react-loading-indicators';
-
+import ScrollProgressBar from './components/ScrollProgressBar';
 
 import './index.css';
 import './gradient.css';
@@ -69,6 +69,7 @@ const AppContent = () => {
     >
       <Navigation />
       <MusicPlayer />
+      <ScrollProgressBar />
       
       <ParallaxWrapper>
         {/* Header section with space background */}
