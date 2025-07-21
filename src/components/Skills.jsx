@@ -358,7 +358,7 @@ const Skills = () => {
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center" 
         style={{ 
-          backgroundImage: 'url("/images/wallpaper.jpg")',
+          backgroundImage: 'url("/images/wallpaper1.jpg")',
           height: '100%'
         }}
       >
