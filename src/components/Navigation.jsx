@@ -192,18 +192,7 @@ const Navigation = () => {
               ))}
             </ul>
 
-            {/* Theme Toggle Button */}
-            <button
-              onClick={handleThemeToggle}
-              className={`ml-4 p-2 rounded-full transition-colors ${
-                isDarkMode || !scrolled
-                  ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-primary-600" />}
-            </button>
+     
           </div>
 
           {/* Mobile Menu Button */}

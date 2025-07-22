@@ -4,25 +4,7 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   // Initialize theme from localStorage or system preference
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check if we're in the browser
-    if (typeof window !== 'undefined') {
-      // Check localStorage first
-      const savedTheme = localStorage.getItem('theme');
-      
-      // If theme is saved in localStorage, use that
-      if (savedTheme === 'dark') {
-        return true;
-      } 
-      // If theme is explicitly set to light, use that
-      if (savedTheme === 'light') {
-        return false;
-      }
-      // Otherwise check system preference
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return false; // Default to light mode
-  });
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Apply theme class to document whenever isDarkMode changes
   useEffect(() => {
