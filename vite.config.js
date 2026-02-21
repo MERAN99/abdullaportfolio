@@ -5,8 +5,9 @@ import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Base URL for GitHub Pages — https://meran99.github.io/portfolio/
+  base: '/portfolio/',
   plugins: [react(), tailwindcss()],
-  assetsInclude: ['**/*.glb', '**/*.gltf'],
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
