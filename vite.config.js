@@ -5,8 +5,8 @@ import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Base URL for GitHub Pages — https://meran99.github.io/portfolio/
-  base: '/portfolio/',
+  // Base URL for GitHub Pages — https://meran99.github.io/abdullaportfolio/
+  base: '/abdullaportfolio/',
   plugins: [react(), tailwindcss()],
   build: {
     outDir: 'dist',

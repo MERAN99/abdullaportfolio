@@ -9,10 +9,7 @@
     <meta name="author" content="Abdulla Mohammed Ahmed" />
     <title>Abdulla Mohammed Ahmed | Portfolio</title>
     
-    <!-- Preload critical assets -->
-    <link rel="preload" href="/models/Moon.glb" as="fetch" crossorigin="anonymous">
-    <link rel="preload" href="/images/astronout.png" as="image">
-    
+
     <!-- DNS prefetch for faster loading -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
@@ -31,19 +28,5 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     
-    <!-- Register service worker for asset caching -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(error => {
-              console.error('Service Worker registration failed:', error);
-            });
-        });
-      }
-    </script>
   </body>
 </html>
